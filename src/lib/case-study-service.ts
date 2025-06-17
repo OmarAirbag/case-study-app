@@ -86,11 +86,11 @@ export const caseStudyService = {
         orderBy('updatedAt', 'desc')
       )
     } else {
-      // Get personal case studies (no orgId)
+      // Get personal case studies (user's case studies regardless of orgId)
+      // This is more compatible with existing data that might not have orgId field
       q = query(
         collection(db, COLLECTION_NAME),
         where('userId', '==', userId),
-        where('orgId', '==', null),
         orderBy('updatedAt', 'desc')
       )
     }
