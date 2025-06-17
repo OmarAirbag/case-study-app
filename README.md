@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Case Study Generator
+
+A Next.js 15 application with Firebase backend for creating and managing case studies.
+
+## Tech Stack
+
+- **Frontend**: Next.js 15 with App Router, React 19, TypeScript
+- **UI**: Tailwind CSS v4, Radix UI components, Lucide React icons
+- **State**: Zustand for client state management, React Hook Form for forms
+- **Backend**: Firebase (Firestore, Functions, Storage, Analytics)
+- **Deployment**: Firebase Hosting + Functions
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js 18+ (Functions require Node.js 22)
+- Firebase CLI installed globally: `npm install -g firebase-tools`
 
+### Development Setup
+
+1. Install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cd functions && npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Start the development server:
+```bash
+npm run dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Start Firebase emulators (optional):
+```bash
+firebase emulators:start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-## Learn More
+## Available Scripts
 
-To learn more about Next.js, take a look at the following resources:
+### Frontend
+- `npm run dev` - Start development server with Turbopack
+- `npm run build` - Build production application
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Firebase Functions
+- `cd functions && npm run build` - Build functions
+- `cd functions && npm run lint` - Lint functions code
+- `cd functions && npm run serve` - Start local emulator
+- `firebase deploy --only functions` - Deploy functions
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Firebase Services
+- `firebase emulators:start` - Start all Firebase emulators locally
+- `firebase deploy` - Deploy all services (hosting, functions, firestore)
 
-## Deploy on Vercel
+## Project Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+├── src/
+│   ├── app/                 # Next.js App Router pages
+│   │   ├── dashboard/       # Dashboard page
+│   │   ├── preview/         # Case study preview pages
+│   │   ├── signin/          # Authentication page
+│   │   └── wizard/          # Case study creation wizard
+│   ├── components/
+│   │   ├── ui/              # Reusable UI components
+│   │   └── wizard/          # Wizard-specific components
+│   ├── hooks/               # Custom React hooks
+│   ├── lib/                 # Utilities and services
+│   │   ├── templates/       # Case study templates
+│   │   └── firebase.ts      # Firebase configuration
+│   ├── store/               # Zustand state stores
+│   └── types/               # TypeScript type definitions
+├── functions/               # Firebase Cloud Functions
+│   └── src/
+│       └── index.ts         # Functions entry point
+└── public/                  # Static assets
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Firebase Configuration
+
+- **Project ID**: `ascasestudiesgenerator`
+- **Firestore**: European region (eur3)
+- **Functions**: Node.js 22 runtime
+- **SDK**: Firebase v9+ modular SDK
+
+## Features
+
+- **Case Study Wizard**: 6-step form for creating comprehensive case studies
+- **Real-time Collaboration**: Multiple users can work on case studies
+- **Rich Media Support**: Upload and manage images, testimonials
+- **Export Options**: Generate PDFs and other formats
+- **Organization Management**: Multi-tenant support for teams
+- **Authentication**: Firebase Auth integration
+
+## Development
+
+The application uses TypeScript throughout with strict type checking. Path aliases are configured with `@/*` mapping to `./src/*` for clean imports.
+
+For detailed development instructions, see [CLAUDE.md](./CLAUDE.md).

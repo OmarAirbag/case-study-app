@@ -1,0 +1,190 @@
+# Sistema Organizzazioni - Documentazione
+
+## Panoramica
+
+Il sistema di organizzazioni permette agli utenti di:
+- Creare e gestire team/aziende
+- Invitare membri con ruoli specifici
+- Condividere case study all'interno del team
+- Gestire permessi granulari
+
+## Struttura Dati
+
+### Collections Firestore
+
+1. **organizations**
+   - Informazioni base dell'organizzazione
+   - Subscription plan e limiti
+   - Settings e features
+
+2. **organizationMembers**
+   - Relazione utente-organizzazione
+   - Ruolo dell'utente
+   - Data di ingresso
+
+3. **invitations**
+   - Inviti pendenti
+   - Token di sicurezza
+   - Scadenza automatica (7 giorni)
+
+4. **organizationEvents**
+   - Audit log di tutte le azioni
+   - Chi ha fatto cosa e quando
+
+## Ruoli e Permessi
+
+### Ruoli Disponibili
+
+1. **Owner** (Proprietario)
+   - Accesso completo
+   - Può eliminare l'organizzazione
+   - Gestione billing
+   - Non può lasciare l'organizzazione
+
+2. **Admin** (Amministratore)
+   - Gestione membri e inviti
+   - Gestione tutti i case study
+   - Modifica settings organizzazione
+   - No accesso billing
+
+3. **Member** (Membro)
+   - Crea/modifica propri case study
+   - Visualizza tutti i case study
+   - Non può invitare altri
+
+4. **Viewer** (Visualizzatore)
+   - Solo lettura
+   - Non può creare contenuti
+
+### Matrice Permessi
+
+| Azione | Owner | Admin | Member | Viewer |
+|--------|-------|-------|---------|---------|
+| Visualizza case study | ✅ | ✅ | ✅ | ✅ |
+| Crea case study | ✅ | ✅ | ✅ | ❌ |
+| Modifica tutti i case study | ✅ | ✅ | ❌ | ❌ |
+| Modifica propri case study | ✅ | ✅ | ✅ | ❌ |
+| Elimina case study | ✅ | ✅ | Solo propri | ❌ |
+| Invita membri | ✅ | ✅ | ❌ | ❌ |
+| Rimuovi membri | ✅ | ✅ | ❌ | ❌ |
+| Cambia ruoli membri | ✅ | ✅ | ❌ | ❌ |
+| Modifica org settings | ✅ | ✅ | ❌ | ❌ |
+| Gestione billing | ✅ | ❌ | ❌ | ❌ |
+| Elimina organizzazione | ✅ | ❌ | ❌ | ❌ |
+
+## Flussi Principali
+
+### 1. Creazione Organizzazione
+
+```typescript
+// User crea nuova org
+const orgId = await organizationService.createOrganization(userId, {
+  name: "Mia Azienda",
+  description: "Descrizione"
+});
+// User diventa automaticamente Owner
+```
+
+### 2. Invito Membri
+
+```typescript
+// Admin/Owner invita nuovo membro
+const token = await organizationService.createInvitation(
+  orgId,
+  "nuovo@email.com",
+  OrganizationRole.MEMBER,
+  invitedByUserId
+);
+
+// Email inviata con link: app.com/invite?token=xxx
+```
+
+### 3. Accettazione Invito
+
+```typescript
+// Nuovo user accetta
+const orgId = await organizationService.acceptInvitation(token, userId);
+// User aggiunto come membro
+```
+
+### 4. Switch Organizzazione
+
+```typescript
+// User cambia org attiva
+await switchOrganization(newOrgId);
+// UI si aggiorna con nuovo contesto
+```
+
+## Limiti per Piano
+
+### Free Plan
+- Max 3 membri
+- Max 10 case study
+- 1 organizzazione
+- Template base
+
+### Pro Plan
+- Max 10 membri  
+- Max 100 case study
+- 3 organizzazioni
+- Tutti i template
+- Custom branding
+
+### Enterprise Plan
+- Membri illimitati
+- Case study illimitati
+- Organizzazioni illimitate
+- Tutte le features
+- Support prioritario
+
+## Security Rules
+
+Le regole Firestore garantiscono:
+- Isolamento dati tra organizzazioni
+- Verifica ruoli per ogni azione
+- Protezione dati sensibili
+- Audit trail completo
+
+## Best Practices
+
+1. **Onboarding Nuovo Utente**
+   - Crea automaticamente org personale
+   - Mostra tutorial sui ruoli
+   - Guida per invitare membri
+
+2. **Gestione Permessi**
+   - Principio del minimo privilegio
+   - Review periodica dei membri
+   - Log di tutte le azioni critiche
+
+3. **UI/UX**
+   - Indicatore chiaro dell'org attiva
+   - Switch veloce tra org
+   - Feedback visuale sui permessi
+
+## Migrazione Utenti Esistenti
+
+Script per migrare utenti esistenti:
+
+```typescript
+// 1. Per ogni utente esistente
+// 2. Crea org personale
+// 3. Migra tutti i case study
+// 4. Mantieni ownership
+
+async function migrateUser(userId: string) {
+  // Crea org personale
+  const orgId = await createPersonalOrg(userId);
+  
+  // Migra case studies
+  await migrateCaseStudies(userId, orgId);
+}
+```
+
+## Prossimi Sviluppi
+
+- [ ] Team billing consolidato
+- [ ] Ruoli custom
+- [ ] Permessi per singolo case study
+- [ ] API keys per organizzazione
+- [ ] SSO per enterprise
